@@ -19,7 +19,10 @@ def convert(filename):
         lines = f.readlines()
         for line in lines:
             if line.startswith("#"):
-                sources.append([])
+                if line.startswith("# In["):
+                    sources.append([])
+                else:
+                    sources.append([line])
             elif line.strip():
                 sources[-1].append(line)
 
@@ -49,7 +52,7 @@ def convert(filename):
         if source:
             template["cells"].append(create_cell(source, execution_count=execution_count))
 
-    with open(filename.replace(".py", ".ipynb"), "w") as f:
+    with open(filename.replace(".py", "_ipynb.ipynb"), "w") as f:
         f.write(json.dumps(template))
 
 
