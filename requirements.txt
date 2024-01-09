@@ -1,0 +1,10 @@
+gensim
+nltk
+scikit-learn
+pandas
+numpy
+matplotlib
+pymongo[srv]
+python-dotenv
+pyjwt
+flask
