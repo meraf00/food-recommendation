@@ -72,9 +72,9 @@ def register():
     return jsonify({"message": "User successfully registered"}), 201
 
 
-@app.route("/api/user/profile", methods=["DELETE"])
+@app.route("/api/user", methods=["DELETE"])
 @login_required
-def delete_profile(username):
+def delete_profile(username: str):
     db.user.delete_one({username: username})
 
     return jsonify({"message": "User successfully deleted"}), 200
@@ -82,7 +82,7 @@ def delete_profile(username):
 
 @app.route("/api/user/profile", methods=["POST"])
 @login_required
-def update_profile(username):
+def update_profile(username: str):
     req = request.get_json()
 
     if "username" in req or "password" in req or "_id" in req:
@@ -98,7 +98,7 @@ def update_profile(username):
 
 @app.route("/api/user/profile", methods=["GET"])
 @login_required
-def get_profile(username):
+def get_profile(username: str):
     user = db.user.find_one({username: username})
     user.pop("password")
 
@@ -107,17 +107,17 @@ def get_profile(username):
 
 @app.route("/api/user/food", methods=["GET"])
 @login_required
-def get_food_recommendation(username):
+def get_food_recommendation(username: str):
     ...
 
 
 @app.route("/api/food", methods=["GET"])
 @login_required
-def get_food_by_ingredient(username):
+def get_food_by_ingredient(username: str):
     ...
 
 
 @app.route("/api/food", methods=["POST"])
 @login_required
-def add_food(username):
+def add_food(username: str):
     ...    
