@@ -8,3 +8,4 @@ pymongo[srv]
 python-dotenv
 pyjwt
 flask
+tensorflow

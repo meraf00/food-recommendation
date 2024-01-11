@@ -1,5 +1,6 @@
 dataset
 ignore
 learning/*.pkl
+learning/*.h5
 venv
 .env
