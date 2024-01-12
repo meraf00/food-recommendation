@@ -11,6 +11,7 @@ import json
 
 from util import login_required
 import recommendation
+from recommendation import recipe_tokenizer
 
 load_dotenv()
 
@@ -239,13 +240,65 @@ def get_food_recommendation(username: str):
 @app.route("/api/food", methods=["GET"])
 @login_required
 def get_food_by_ingredient(username: str):
-    ...
+    """
+    Sample request:
 
+    GET /api/food?query=bread+milk
 
-@app.route("/api/food", methods=["POST"])
-@login_required
-def add_food(username: str):
-    ...
+    Sample response:
+
+    {
+        "foods": [
+            {
+                "description": "Bread, white, commercially prepared, toasted",
+                "category": "Cerials and Bakery Products",
+                "nutrition": {
+                    "energy_kcal": 253.1,
+                    "protein_gm": 253.1,
+                    "carbohydrate_gm": 253.1,
+                    "total_sugar_gm": 253.1,
+                    "dietary_fiber_gm": 253.1,
+                    "total_fat_gm": 253.1,
+                    "total_saturated_fatty_acids_gm": 253.1,
+                    "total_monounsaturated_fatty_acids_gm": 253.1,
+                    "total_polyunsaturated_fatty_acids_gm": 253.1,
+                    "cholesterol_mg": 253.1,
+                    "vitamin_e_mg": 253.1,
+                    "calcium_mg": 253.1,
+                    "phosphorus_mg": 253.1,
+                    "magnesium_mg": 253.1,
+                    "iron_mg": 253.1,
+                    "zinc_mg": 253.1,
+                    "copper_mg": 253.1,
+                    "sodium_mcg": 253.1,
+                    "potassium_mg": 253.1,
+                    "selenium_mcg": 253.1,
+                    "caffeine_mg": 253.1,
+                }
+
+            }
+        ]
+    }
+    """
+
+    query = request.args.get("query")
+
+    recommendations = recommendation.find_similar_recipes(query)
+
+    foods = [{"nutrition": {}} for _ in range(len(recommendations))]
+
+    for attrib, values in recommendations.items():
+        for i, value in enumerate(values):
+            if attrib == "Main food description":
+                foods[i]["description"] = value
+
+            elif attrib == "WWEIA Category description":
+                foods[i]["category"] = value
+
+            else:
+                foods[i]["nutrition"][attrib] = value
+
+    return jsonify({"foods": foods}), 200
 
 
 if __name__ == "__main__":
