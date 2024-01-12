@@ -12,6 +12,7 @@ import json
 from util import login_required
 import recommendation
 from recommendation import recipe_tokenizer
+import requests
 
 load_dotenv()
 
@@ -35,6 +36,23 @@ def generate_token(user: dict):
         algorithm="HS256",
     )
     return token
+
+
+def get_food_images(food_name):
+    response = requests.get(
+        f"https://www.googleapis.com/customsearch/v1?key={os.getenv('API_KEY')}&cx={os.getenv('ENGINE_ID')}&q={food_name}&searchType=image&imgSize=XLARGE"
+    )
+
+    if response.status_code == 200:
+        res = response.json()
+        image_urls = []
+        thumbnails = []
+        for item in res["items"]:
+            thumbnails.append(item["image"]["thumbnailLink"])
+            image_urls.append(item["link"])
+        return thumbnails, image_urls
+
+    return []
 
 
 @app.route("/api/auth/login", methods=["POST"])
@@ -164,6 +182,7 @@ def get_food_recommendation(username: str):
         "foods": [
             {
                 "description": "Bread, white, commercially prepared, toasted",
+                "images": ["https://someurl.com/bread.jpg", "https://otherurl.com/bread_2.jpg"],
                 "category": "Cerials and Bakery Products",
                 "nutrition": {
                     "energy_kcal": 253.1,
@@ -227,6 +246,7 @@ def get_food_recommendation(username: str):
         for i, value in enumerate(values):
             if attrib == "Main food description":
                 foods[i]["description"] = value
+                foods[i]["thumbnails"], foods[i]["images"] = get_food_images(value)
 
             elif attrib == "WWEIA Category description":
                 foods[i]["category"] = value
@@ -251,6 +271,7 @@ def get_food_by_ingredient(username: str):
         "foods": [
             {
                 "description": "Bread, white, commercially prepared, toasted",
+                "images": ["https://someurl.com/bread.jpg", "https://otherurl.com/bread_2.jpg"],
                 "category": "Cerials and Bakery Products",
                 "nutrition": {
                     "energy_kcal": 253.1,
@@ -291,6 +312,7 @@ def get_food_by_ingredient(username: str):
         for i, value in enumerate(values):
             if attrib == "Main food description":
                 foods[i]["description"] = value
+                foods[i]["thumbnails"], foods[i]["images"] = get_food_images(value)
 
             elif attrib == "WWEIA Category description":
                 foods[i]["category"] = value

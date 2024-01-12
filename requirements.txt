@@ -9,3 +9,4 @@ python-dotenv
 pyjwt
 flask
 tensorflow
+requests
