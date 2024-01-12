@@ -34,28 +34,16 @@ def get_nearest_nbr(user, k=5):
     return np.array([idx_user_map[i] for i in idxs[0]])[:k]
 
 
-def collab_filter(user):
+def collab_filter(user: dict) -> pd.DataFrame:
     model_folder = os.path.join(base_path, "collaborative_filtering_model")
 
     model = load_model(os.path.join(model_folder, "model.h5"))
-
-    with open(os.path.join(model_folder, "day_encoder.pkl"), "rb") as f:
-        day_encoder = pickle.load(f)
-
-    with open(os.path.join(model_folder, "occasion_encoder.pkl"), "rb") as f:
-        occasion_encoder = pickle.load(f)
-
-    with open(os.path.join(model_folder, "source_encoder.pkl"), "rb") as f:
-        source_encoder = pickle.load(f)
 
     with open(os.path.join(model_folder, "food_idx_map.pkl"), "rb") as f:
         food_idx_map = pickle.load(f)
 
     with open(os.path.join(model_folder, "user_idx_map.pkl"), "rb") as f:
         user_idx_map = pickle.load(f)
-
-    with open(os.path.join(model_folder, "scaler.pkl"), "rb") as f:
-        scaler = pickle.load(f)
 
     with open(os.path.join(model_folder, "food.pkl"), "rb") as f:
         food_df = pickle.load(f)
@@ -91,46 +79,47 @@ def collab_filter(user):
 
     size = len(recommeded_foods)
 
+    food_desc = pd.merge(food_desc, food_df, on="usda_food_code")
     food_desc.set_index("usda_food_code", inplace=True)
 
     predicted = food_desc.loc[recommeded_foods]
 
     k = random.randint(10, 20)
-    print(size, k)
 
     return predicted[size // 4 : min(size // 4 + k, size)]
 
 
-pred = collab_filter(
-    [
-        95.2,
-        14.7,
-        67.6,
-        56.3,
-        24.8,
-        192.7,
-        89.8,
-        15.000000,
-        180.000000,
-        140.000000,
-        20.333333,
-    ]
-)
-print(pred)
+if __name__ == "__main__":
+    pred = collab_filter(
+        [
+            95.2,
+            14.7,
+            67.6,
+            56.3,
+            24.8,
+            192.7,
+            89.8,
+            15.000000,
+            180.000000,
+            140.000000,
+            20.333333,
+        ]
+    )
+    print(pred)
 
-pred = collab_filter(
-    [
-        42.2,
-        154.7,
-        17.6,
-        36.3,
-        33.8,
-        22.7,
-        63.8,
-        85.000000,
-        108.000000,
-        67.000000,
-        93.333333,
-    ]
-)
-print(pred)
+    pred = collab_filter(
+        [
+            42.2,
+            154.7,
+            17.6,
+            36.3,
+            33.8,
+            22.7,
+            63.8,
+            85.000000,
+            108.000000,
+            67.000000,
+            93.333333,
+        ]
+    )
+    print(pred)
